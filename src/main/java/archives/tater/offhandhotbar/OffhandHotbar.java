@@ -15,6 +15,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
@@ -108,8 +109,9 @@ public class OffhandHotbar implements ModInitializer, ClientModInitializer {
 		var focusSwap = focusSwapped;
 		if (focusSwap) updateFocusSwap(client, false);
 
-        // Swap the offhand with the newly selected slot
-        swapOffhand(client, getOffhandHotbarScreenHandlerSlot(selectedOffhandSlot, client));
+        offhandCycle(client,
+                getOffhandHotbarScreenHandlerSlot(lastOffhandSlot, client),
+                getOffhandHotbarScreenHandlerSlot(selectedOffhandSlot, client));
 
 		if (focusSwap) updateFocusSwap(client, true);
 
@@ -146,6 +148,17 @@ public class OffhandHotbar implements ModInitializer, ClientModInitializer {
         client.interactionManager.clickSlot(player.playerScreenHandler.syncId, PlayerScreenHandler.HOTBAR_START + player.getInventory().selectedSlot, OFFHAND_SWAP_ID, SlotActionType.SWAP, player);
     }
 
+	/**
+	 * Checks if the CONTROL_OPPOSITE_KEY is being used to control the offhand hotbar.
+	 * When true, focusSwap should NOT be activated since the key is being used for offhand control.
+	 */
+	public static boolean isControlKeyForOffhandHotbar() {
+		// If scroll controls main hand by default, then CONTROL_OPPOSITE_KEY + scroll = offhand hotbar
+		// If keyboard controls main hand by default, then CONTROL_OPPOSITE_KEY + keyboard = offhand hotbar
+		return (OffhandHotbarConfig.scrollControls == Hand.MAIN_HAND) ||
+			   (OffhandHotbarConfig.keyboardControls == Hand.MAIN_HAND);
+	}
+
 	@Override
 	public void onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
@@ -160,7 +173,10 @@ public class OffhandHotbar implements ModInitializer, ClientModInitializer {
                     swapped = !swapped;
                 }
 
-				updateFocusSwap(client, CONTROL_OPPOSITE_KEY.isPressed());
+				// Only activate focusSwap when CONTROL_OPPOSITE_KEY is pressed AND it's not being
+				// used to control the offhand hotbar (i.e., neither scroll nor keyboard uses the key for offhand)
+				boolean shouldFocusSwap = CONTROL_OPPOSITE_KEY.isPressed() && !isControlKeyForOffhandHotbar();
+				updateFocusSwap(client, shouldFocusSwap);
             } else {
                 if (swapped) {
                     swapOffhand(client);
