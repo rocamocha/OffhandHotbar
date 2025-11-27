@@ -109,8 +109,11 @@ public class OffhandHotbar implements ModInitializer, ClientModInitializer {
 		var focusSwap = focusSwapped;
 		if (focusSwap) updateFocusSwap(client, false);
 
-        // Swap the offhand with the newly selected inventory slot
-        swapOffhand(client, getOffhandHotbarScreenHandlerSlot(selectedOffhandSlot, client));
+        // When swapped=true, offhand item is in lastOffhandSlot position
+        // Cycle: swap lastOffhandSlot→offhand (restore), then swap newSlot→offhand (select new item)
+        offhandCycle(client,
+                getOffhandHotbarScreenHandlerSlot(lastOffhandSlot, client),
+                getOffhandHotbarScreenHandlerSlot(selectedOffhandSlot, client));
 
 		if (focusSwap) updateFocusSwap(client, true);
 
