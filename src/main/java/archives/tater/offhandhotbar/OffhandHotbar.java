@@ -105,6 +105,7 @@ public class OffhandHotbar implements ModInitializer, ClientModInitializer {
 	public static void updateOffhandSlots(MinecraftClient client) {
         if (selectedOffhandSlot == lastOffhandSlot) return;
 		if (client.player == null) return;
+		if (!swapped) return; // Only cycle when items are in swapped state
 
 		var focusSwap = focusSwapped;
 		if (focusSwap) updateFocusSwap(client, false);
