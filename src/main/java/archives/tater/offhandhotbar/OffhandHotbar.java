@@ -105,20 +105,21 @@ public class OffhandHotbar implements ModInitializer, ClientModInitializer {
 	public static void updateOffhandSlots(MinecraftClient client) {
         if (selectedOffhandSlot == lastOffhandSlot) return;
 		if (client.player == null) return;
-		if (!swapped) return; // Only cycle when items are in swapped state
+		
+		// Always update tracking
+		int oldSlot = lastOffhandSlot;
+		lastOffhandSlot = selectedOffhandSlot;
+		
+		if (!swapped) return; // Not in swapped state, nothing to swap
 
 		var focusSwap = focusSwapped;
 		if (focusSwap) updateFocusSwap(client, false);
 
-        // When swapped=true, offhand item is in lastOffhandSlot position
-        // Cycle: swap lastOffhandSlot→offhand (restore), then swap newSlot→offhand (select new item)
-        offhandCycle(client,
-                getOffhandHotbarScreenHandlerSlot(lastOffhandSlot, client),
-                getOffhandHotbarScreenHandlerSlot(selectedOffhandSlot, client));
+        // Swap the current offhand back to its old slot, then swap the new slot into offhand
+        swapOffhand(client, getOffhandHotbarScreenHandlerSlot(oldSlot, client));
+        swapOffhand(client, getOffhandHotbarScreenHandlerSlot(selectedOffhandSlot, client));
 
 		if (focusSwap) updateFocusSwap(client, true);
-
-        lastOffhandSlot = selectedOffhandSlot;
     }
 
 	public static void scrollInventory(MinecraftClient client, boolean forward) {
