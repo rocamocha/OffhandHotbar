@@ -187,10 +187,11 @@ public abstract class InGameHudMixin {
 	 * Modifies which items are displayed in each hotbar slot.
 	 * 
 	 * For the main hotbar (offhand=false): Shows normal hotbar slots (0-8)
-	 * For the offhand hotbar (offhand=true): Shows inventory slots 27-35
+	 * For the offhand hotbar (offhand=true): Shows inventory slots 27-35,
+	 * except for the selected slot which shows the actual offhand item.
 	 * 
-	 * The selected slot in the offhand hotbar shows the actual offhand item,
-	 * since that's what was swapped there when the user made their selection.
+	 * This way, the selected slot always displays what's currently equipped
+	 * in the offhand, matching the expected behavior.
 	 */
 	@WrapOperation(
 		method = "renderHotbar",
@@ -203,8 +204,7 @@ public abstract class InGameHudMixin {
 			return original.call(instance, index);
 		}
 		
-		// Offhand hotbar: show items from inventory slots 27-35
-		// The selected slot should show the offhand item (since they were swapped)
+		// Offhand hotbar: selected slot shows offhand item, others show inventory
 		if (index == OffhandHotbar.selectedOffhandSlot) {
 			return offhandStack;
 		}
@@ -214,6 +214,9 @@ public abstract class InGameHudMixin {
 	/**
 	 * Hides the vanilla offhand item display (the small slot on the opposite side).
 	 * We show the offhand through our second hotbar instead.
+	 * 
+	 * This affects all isEmpty() checks in renderHotbar to ensure the vanilla
+	 * offhand slot rendering is completely suppressed.
 	 */
 	@ModifyExpressionValue(
 		method = "renderHotbar",
