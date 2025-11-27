@@ -125,7 +125,8 @@ public abstract class InGameHudMixin {
 				matrices.push();
 				offhandhotbar$hotbarRotate(context, mainArm == Arm.LEFT);
 			}
-			default -> {}
+			// STACKED_SWAPPED and VERTICAL: no initial offset needed, handled after first render
+			default -> { /* No positioning needed for first hotbar */ }
 		}
 		
 		// Render main hotbar
