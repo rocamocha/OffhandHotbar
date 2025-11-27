@@ -109,9 +109,8 @@ public class OffhandHotbar implements ModInitializer, ClientModInitializer {
 		var focusSwap = focusSwapped;
 		if (focusSwap) updateFocusSwap(client, false);
 
-        offhandCycle(client,
-                getOffhandHotbarScreenHandlerSlot(lastOffhandSlot, client),
-                getOffhandHotbarScreenHandlerSlot(selectedOffhandSlot, client));
+        // Swap the offhand with the newly selected inventory slot
+        swapOffhand(client, getOffhandHotbarScreenHandlerSlot(selectedOffhandSlot, client));
 
 		if (focusSwap) updateFocusSwap(client, true);
 
