@@ -1,23 +1,25 @@
 package archives.tater.offhandhotbar.mixin.client;
 
+import archives.tater.offhandhotbar.OffhandHotbar;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * Mixin for the game menu screen.
- * 
- * <h2>Note:</h2>
- * This mixin was previously used to handle item swapping when disconnecting.
- * With the simplified architecture, continuous swapping has been removed,
- * so this mixin is no longer needed but kept for potential future use.
- */
 @Mixin(GameMenuScreen.class)
 public abstract class GameMenuScreenMixin extends Screen {
-	protected GameMenuScreenMixin(Text title) {
-		super(title);
-	}
-	
-	// No longer needed - the simplified architecture doesn't continuously swap items
+    protected GameMenuScreenMixin(Text title) {
+        super(title);
+    }
+
+    @Inject(
+            method = "disconnect",
+            at = @At("HEAD")
+    )
+    private void unswap(CallbackInfo ci) {
+        OffhandHotbar.swapOffhand(client);
+    }
 }
