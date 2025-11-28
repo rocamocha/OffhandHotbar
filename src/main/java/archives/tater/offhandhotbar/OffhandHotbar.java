@@ -15,6 +15,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
@@ -161,7 +162,11 @@ public class OffhandHotbar implements ModInitializer, ClientModInitializer {
                     swapped = !swapped;
                 }
 
-				updateFocusSwap(client, CONTROL_OPPOSITE_KEY.isPressed());
+				// Only activate focusSwap when CONTROL_OPPOSITE_KEY is pressed AND it's not being
+				// used to control the offhand hotbar (i.e., when scroll or keyboard controls main hand by default)
+				boolean shouldFocusSwap = CONTROL_OPPOSITE_KEY.isPressed() && 
+					!(OffhandHotbarConfig.scrollControls == Hand.MAIN_HAND || OffhandHotbarConfig.keyboardControls == Hand.MAIN_HAND);
+				updateFocusSwap(client, shouldFocusSwap);
             } else {
                 if (swapped) {
                     swapOffhand(client);
